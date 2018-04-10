@@ -1,0 +1,21 @@
+{
+    "name": "buildempire/moodle-local_cleanurls",
+    "description": "Moodle Plugin to Add Clean URLs",
+    "keywords" : ["buildempire", "moodle", "totara"],
+    "type": "moodle-mod",
+    "authors": [
+        {
+            "name": "Jonny Barnes",
+            "email": "jonathan.barnes@buildempire.co.uk"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "composer/installers": "~1.0"
+    },
+    "support": {
+        "email": "contact@buildempire.co.uk",
+        "source": "https://github.com/BuildEmpire/moodle-local_cleanurls"
+    },
+    "version": "0.0.1"
+}
