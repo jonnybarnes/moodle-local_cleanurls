@@ -36,17 +36,21 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2017 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class uncleaner {
+abstract class uncleaner
+{
     /**
      * @param string|moodle_url $clean
      * @return moodle_url
      */
-    public static function unclean($clean) {
+    public static function unclean($clean)
+    {
         $unclean = self::load_cache($clean);
         if (!is_null($unclean)) {
             return $unclean;
         }
 
+        // remove course type before we attempt uncleaning
+        $clean   = preg_replace('/\/course\/([a-z]+)\//', '/course/', $clean);
         $unclean = self::perform_uncleaning($clean);
 
         self::save_cache($clean, $unclean);
@@ -58,13 +62,14 @@ abstract class uncleaner {
      * @return moodle_url
      * @throws moodle_exception
      */
-    private static function perform_uncleaning($clean) {
+    private static function perform_uncleaning($clean)
+    {
         $root = new root_uncleaner($clean);
         $node = $root;
 
         do {
             $lastnode = $node;
-            $node = $node->get_child();
+            $node     = $node->get_child();
         } while (!is_null($node));
 
         $unclean = $lastnode->get_unclean_url();
@@ -89,7 +94,8 @@ abstract class uncleaner {
      * @return moodle_url
      * @throws moodle_exception
      */
-    public static function load_cache($clean) {
+    public static function load_cache($clean)
+    {
         if (!is_string($clean)) {
             $clean = $clean->raw_out();
         }
@@ -105,7 +111,8 @@ abstract class uncleaner {
      * @param string|moodle_url $clean
      * @param string|moodle_url $unclean
      */
-    public static function save_cache($clean, $unclean) {
+    public static function save_cache($clean, $unclean)
+    {
         if (!is_string($clean)) {
             $clean = $clean->raw_out();
         }
@@ -115,7 +122,8 @@ abstract class uncleaner {
         self::get_cache()->set($clean, $unclean);
     }
 
-    public static function get_cache() {
+    public static function get_cache()
+    {
         return cache::make('local_cleanurls', 'uncleaning');
     }
 
@@ -139,7 +147,8 @@ abstract class uncleaner {
      *
      * @return string[] List of uncleaner-derived classes that could be a child of this object.
      */
-    public static function list_child_options() {
+    public static function list_child_options()
+    {
         return [];
     }
 
@@ -151,7 +160,8 @@ abstract class uncleaner {
      * @param uncleaner $parent
      * @return bool
      */
-    public static function can_create($parent) {
+    public static function can_create($parent)
+    {
         return false;
     }
 
@@ -161,7 +171,8 @@ abstract class uncleaner {
      * @param uncleaner|null $parent
      * @throws invalid_parameter_exception
      */
-    public function __construct($parent) {
+    public function __construct($parent)
+    {
         if (!static::can_create($parent)) {
             throw new invalid_parameter_exception('Cannot create for given parent.');
         }
@@ -175,19 +186,21 @@ abstract class uncleaner {
     /**
      * @return moodle_url
      */
-    public abstract function get_unclean_url();
+    abstract public function get_unclean_url();
 
     /**
      * @return uncleaner
      */
-    public function get_parent() {
+    public function get_parent()
+    {
         return $this->parent;
     }
 
     /**
      * @return uncleaner
      */
-    public function get_child() {
+    public function get_child()
+    {
         return $this->child;
     }
 
@@ -196,9 +209,10 @@ abstract class uncleaner {
      * - subpath = removing one level of path from the parent or empty if no parent.
      * - mypath = the removed path or empty if not available.
      */
-    protected function prepare_path() {
+    protected function prepare_path()
+    {
         $this->subpath = is_null($this->parent) ? [] : $this->parent->subpath;
-        $this->mypath = array_shift($this->subpath);
+        $this->mypath  = array_shift($this->subpath);
 
         if (is_null($this->mypath)) {
             $this->mypath = '';
@@ -208,14 +222,16 @@ abstract class uncleaner {
     /**
      * It defaults to the parent parameters or empty array if no parent.
      */
-    protected function prepare_parameters() {
+    protected function prepare_parameters()
+    {
         $this->parameters = is_null($this->parent) ? [] : $this->parent->parameters;
     }
 
     /**
      * It defaults to trying all available options if there is a subpath.
      */
-    protected function prepare_child() {
+    protected function prepare_child()
+    {
         $this->child = null;
 
         if (empty($this->subpath)) {
@@ -234,21 +250,24 @@ abstract class uncleaner {
     /**
      * @return string
      */
-    public function get_mypath() {
+    public function get_mypath()
+    {
         return $this->mypath;
     }
 
     /**
      * @return string[]
      */
-    public function get_subpath() {
+    public function get_subpath()
+    {
         return $this->subpath;
     }
 
     /**
      * @return string[]
      */
-    public function get_parameters() {
+    public function get_parameters()
+    {
         return $this->parameters;
     }
 }

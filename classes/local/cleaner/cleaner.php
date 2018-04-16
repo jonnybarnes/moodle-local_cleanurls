@@ -184,8 +184,12 @@ class cleaner
         }
 
         $course = get_course($this->params['id']);
+        $type_id = $DB->get_record_sql('SELECT type FROM {cscore_course_information} WHERE course_id = :course_id', [
+            'course_id' => $course->id,
+        ])->type;
+        $type = \local_cscore\Information::COURSE_TYPE_SEARCHABLES[$type_id][0];
 
-        $newpath = '/course/' . urlencode($course->shortname);
+        $newpath = '/course/' . urlencode($type) , '/' . urlencode($course->shortname);
         if ($this->check_path_allowed($newpath)) {
             $this->path = $newpath;
             unset($this->params['id']);
@@ -205,8 +209,12 @@ class cleaner
 
         $courseid = $DB->get_field('course', 'id', ['shortname' => $this->params['name']]);
         $course   = get_course($courseid);
+        $type_id = $DB->get_record_sql('SELECT type FROM {cscore_course_information} WHERE course_id = :course_id', [
+            'course_id' => $course->id,
+        ])->type;
+        $type = \local_cscore\Information::COURSE_TYPE_SEARCHABLES[$type_id][0];
 
-        $newpath = '/course/' . urlencode($course->shortname);
+        $newpath = '/course/' . urlencode($type) , '/' . urlencode($course->shortname);
         if ($this->check_path_allowed($newpath)) {
             $this->path = $newpath;
             unset($this->params['name']);
